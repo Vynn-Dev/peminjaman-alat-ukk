@@ -9,7 +9,10 @@ class Pengembalian extends Model
     protected $fillable = [
         'peminjaman_id',
         'tanggal_pengembalian',
-        'status'
+        'kondisi_setelah_kembali',
+        'catatan',
+        'denda',
+        'status',
     ];
 
     public function peminjaman()

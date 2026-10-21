@@ -2,10 +2,13 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\kategoriController;
-use App\Http\Controllers\alatController;
-use App\Http\Controllers\peminjamanController;
-use App\Http\Controllers\pengembalianController;
+use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\AlatController;
+use App\Http\Controllers\PeminjamanController;
+use App\Http\Controllers\PengembalianController;
+use App\Http\Controllers\LogAktivitasController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\KatalogController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,21 +26,23 @@ Route::get('/', function () {
 |--------------------------------------------------------------------------
 */
 
-Route::get('/dashboard', function () {
+Route::get(
+    '/dashboard',
+    [DashboardController::class, 'index']
+)->middleware(['auth'])
+ ->name('dashboard');
 
-    if (auth()->user()->role == 'admin') {
-        return view('dashboard.admin');
-    }
+/*
+|--------------------------------------------------------------------------
+| KATALOG ALAT (SEMUA ROLE)
+|--------------------------------------------------------------------------
+*/
 
-    if (auth()->user()->role == 'petugas') {
-        return view('dashboard.petugas');
-    }
-
-    if (auth()->user()->role == 'peminjam') {
-        return view('dashboard.peminjam');
-    }
-
-})->middleware(['auth'])->name('dashboard');
+Route::get(
+    '/katalog',
+    [KatalogController::class, 'index']
+)->middleware(['auth'])
+ ->name('katalog.index');
 
 /*
 |--------------------------------------------------------------------------
@@ -102,14 +107,17 @@ Route::middleware(['auth'])->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'role:petugas'])->group(function () {
+Route::post(
+    '/peminjaman/{id}/approve',
+    [PeminjamanController::class, 'approve']
+)->middleware(['auth', 'role:petugas'])
+ ->name('peminjaman.approve');
 
-    Route::get(
-        '/peminjaman/{id}/approve',
-        [PeminjamanController::class, 'approve']
-    )->name('peminjaman.approve');
-
-});
+Route::post(
+    '/peminjaman/{id}/tolak',
+    [PeminjamanController::class, 'tolak']
+)->middleware(['auth', 'role:petugas'])
+ ->name('peminjaman.tolak');
 
 /*
 |--------------------------------------------------------------------------
@@ -117,13 +125,22 @@ Route::middleware(['auth', 'role:petugas'])->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth'])->group(function () {
+Route::post(
+    '/pengembalian/{id}',
+    [PengembalianController::class, 'store']
+)->middleware(['auth'])
+ ->name('pengembalian.store');
 
-    Route::post(
-        '/pengembalian/{id}',
-        [PengembalianController::class, 'store']
-    )->name('pengembalian.store');
+/*
+|--------------------------------------------------------------------------
+| LOG AKTIVITAS (ADMIN)
+|--------------------------------------------------------------------------
+*/
 
-});
+Route::get(
+    '/log-aktivitas',
+    [LogAktivitasController::class, 'index']
+)->middleware(['auth', 'role:admin'])
+ ->name('logaktivitas.index');
 
 require __DIR__.'/auth.php';

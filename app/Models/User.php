@@ -29,4 +29,16 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Nama peran yang ramah untuk ditampilkan di UI.
+     */
+    public function roleName(): string
+    {
+        return [
+            'admin' => 'Administrator',
+            'petugas' => 'Petugas',
+            'peminjam' => 'Peminjam',
+        ][$this->role] ?? $this->role;
+    }
 }
